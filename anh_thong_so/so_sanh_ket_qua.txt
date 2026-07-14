@@ -1,0 +1,13 @@
+================== SO SANH MODEL CU (TUSIMPLE) VS MOI (CURVELANES) ==================
+Metric                    | Model Cu (TuSimple)    | Model Moi (CurveLanes)
+---------------------------------------------------------------------------
+Path                      | models/tusimple_18.pth | models/curvelanes_finetuned_best.pth
+Val Total Loss            | 2.4799                 | 1.5260                
+Val Cls Loss              | 2.4730                 | 1.5052                
+Val Str Loss              | 0.0017                 | 0.0052                
+Accuracy (Strict)         | 7.25                 % | 30.41                %
+Precision (Tolerance)     | 36.88                % | 81.89                %
+Recall (Tolerance)        | 27.32                % | 81.45                %
+F1-Score (Tolerance)      | 31.38                % | 81.67                %
+Optimal Threshold         | 0.90                   | 0.65                  
+=====================================================================================

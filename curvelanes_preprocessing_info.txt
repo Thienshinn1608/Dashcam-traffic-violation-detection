@@ -1,0 +1,25 @@
+==================================================
+CURVELANES DATASET PREPROCESSING & STATISTICS REPORT
+==================================================
+- Target Split Evaluated : train
+- Total Images in Split  : 21000
+- Sampled Images for Stats: 2000
+- Average Original Resolution: 2492.7 x 1387.0
+- Normalization Mean     : [0.485, 0.456, 0.406]
+- Normalization Std      : [0.229, 0.224, 0.225]
+
+LANE DISTRIBUTION STATS:
+- Average Lanes per Image: 4.48
+- Min Lanes in an Image  : 1
+- Max Lanes in an Image  : 11
+- Distribution Details   : 1 lanes: 3 anh, 2 lanes: 83 anh, 3 lanes: 475 anh, 4 lanes: 504 anh, 5 lanes: 491 anh, 6 lanes: 277 anh, 7 lanes: 122 anh, 8 lanes: 34 anh, 9 lanes: 5 anh, 10 lanes: 4 anh, 11 lanes: 2 anh
+- Average Points per Lane: 8.66
+
+UFLD NETWORK TARGET CONFIGURATION:
+- Network Input Width (W): 800 (800)
+- Network Input Height (H): 288 (288)
+- Griding Columns (Cls)  : 100 (100)
+- Max Supported Lanes (Ch): 4 (4)
+- Row Anchors (Rows)     : 56 anchors (56)
+- Row Anchor pixel list  : [64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 256, 260, 264, 268, 272, 276, 280, 284]
+==================================================

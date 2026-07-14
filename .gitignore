@@ -1,0 +1,54 @@
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environment ─────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env
+
+# ── Model weights (quá nặng, dùng Git LFS hoặc upload riêng) ───────────────
+# Giữ lại best.pt trong runs/ nhưng bỏ last.pt và các .pth lane detector
+models/curvelanes_finetuned_best.pth
+models/curvelanes_scratch_best.pth
+models/tusimple_18.pth
+runs/detect/fast_adas_model/weights/last.pt
+yolo11n.pt
+
+# ── Output / Generated files ────────────────────────────────────────────────
+output/
+src/output/
+
+# ── Video demo (quá nặng) ───────────────────────────────────────────────────
+demo_input1.mp4
+demo_input2.mp4
+demo_input3.mp4
+
+# ── Large dataset label file ────────────────────────────────────────────────
+test_label_new.json
+
+# ── IDE / Editor ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Jupyter / IPython ────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log

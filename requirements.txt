@@ -1,0 +1,18 @@
+# Core Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+ultralytics>=8.0.0
+
+# Computer Vision
+opencv-python>=4.8.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Web App
+streamlit>=1.30.0
+
+# Data processing
+pandas>=2.0.0
+
+# Visualization
+matplotlib>=3.7.0

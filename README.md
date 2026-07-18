@@ -1,326 +1,297 @@
-Dashcam Traffic Violation Monitoring System
+# 🚘 Hệ Thống Giám Sát Vi Phạm Giao Thông Từ Camera Hành Trình
 
-An AI-based traffic monitoring system that analyzes dashcam videos to detect vehicles, track their identities, identify road lanes, estimate vehicle distance, and detect potentially dangerous driving behaviors.
+Hệ thống ứng dụng trí tuệ nhân tạo để phát hiện và theo dõi phương tiện từ video camera hành trình. Dự án kết hợp **YOLOv11**, **BYTETrack**, **Kalman Filter** và **UFLD-v2** để nhận diện phương tiện, duy trì ID, phát hiện làn đường, ước tính khoảng cách và cảnh báo các hành vi giao thông nguy hiểm.
 
-The project combines YOLO11, BYTETrack, Kalman Filter, Ultra-Fast Lane Detection (UFLD), monocular distance estimation, and temporal rule-based verification. A Streamlit dashboard is provided for uploading videos, visualizing results, and reviewing detected violations.
+## 👤 Người thực hiện
 
-Project Overview
+| Họ và tên | MSSV |
+|---|---|
+| Ngô Long Thiên | 2001230920 |
 
-Traditional object detection only identifies vehicles independently in each frame. This project extends the detection pipeline by combining vehicle tracking, lane understanding, distance estimation, and temporal reasoning.
+## 📸 Giao diện và kết quả xử lý
 
-The system can:
+### Giao diện xử lý video
 
-Detect cars, trucks, buses, and motorcycles from dashcam footage.
-Maintain stable vehicle IDs across consecutive frames.
-Detect lane boundaries using UFLD.
-Estimate the distance between the ego vehicle and surrounding vehicles.
-Detect unsafe following distance.
-Detect dangerous vehicle cut-ins.
-Detect ego-lane departure.
-Detect vehicles moving outside or across lane boundaries.
-Confirm violations across multiple frames to reduce false alarms.
-Save annotated videos, evidence images, and CSV violation logs.
-Display processing results through a Streamlit dashboard.
-System Pipeline
-flowchart LR
-    A[Dashcam Video] --> B[Frame Preprocessing]
-    B --> C[YOLO11 Vehicle Detection]
-    C --> D[BYTETrack + Kalman Filter]
-    B --> E[UFLD Lane Detection]
-    D --> F[Monocular Distance Estimation]
-    E --> G[Lane Geometry Analysis]
-    F --> H[Violation Rule Engine]
-    G --> H
-    H --> I[Temporal Confirmation]
-    I --> J[Annotated Video]
-    I --> K[Evidence Images]
-    I --> L[CSV Violation Report]
-    J --> M[Streamlit Dashboard]
-    K --> M
-    L --> M
-Detected Events
-Event	Description
-UNSAFE_DISTANCE	A tracked vehicle remains closer than the configured safe-distance threshold.
-DANGEROUS_CUT_IN	A vehicle moves laterally into the ego lane at a potentially unsafe distance.
-EGO_LANE_DEPARTURE	The dashcam vehicle appears to leave its current lane.
-OUTSIDE_LANE	Another vehicle crosses or moves outside the detected lane boundaries.
+Giao diện Streamlit cho phép lựa chọn hoặc tải video, theo dõi quá trình xử lý và xem thống kê phương tiện, khoảng cách và cảnh báo.
 
-A violation is only confirmed when its conditions remain valid for multiple consecutive detection frames. A cooldown mechanism prevents the same tracked vehicle from being counted repeatedly.
+<p align="center">
+  <img src="docs/giao_dien_xu_li.png" width="900" alt="Giao diện xử lý video bằng Streamlit">
+</p>
 
-Technical Highlights
-Vehicle Detection
+### Kết quả nhận diện phương tiện và làn đường
 
-YOLO11 is fine-tuned for vehicle detection in dashcam scenes. The detector filters the output to retain relevant road vehicles and supports low-confidence recovery for large or nearby vehicles.
+Hệ thống hiển thị bounding box, ID theo dõi, khoảng cách ước tính và đường làn trực tiếp trên từng khung hình.
 
-Multi-object Tracking
+<p align="center">
+  <img src="docs/ket_qua_nhan_dien.png" width="900" alt="Kết quả nhận diện phương tiện và làn đường">
+</p>
 
-BYTETrack is combined with a Kalman Filter to:
+### Kết quả phát hiện hành vi nguy hiểm
 
-Maintain a unique ID for each detected vehicle.
-Recover vehicles after temporary occlusion.
-Reduce duplicate counting.
-Provide motion history for cut-in detection.
-Lane Detection
+<table>
+  <tr>
+    <td align="center"><b>Không giữ khoảng cách an toàn</b></td>
+    <td align="center"><b>Phương tiện lấn làn</b></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="docs/ket_qua_vi_pham_khong_giu_khoang_cach.png" width="100%" alt="Kết quả phát hiện không giữ khoảng cách">
+    </td>
+    <td>
+      <img src="docs/ket_qua_vi_pham_lan_lan.png" width="100%" alt="Kết quả phát hiện phương tiện lấn làn">
+    </td>
+  </tr>
+</table>
 
-UFLD is used to detect lane points efficiently. The lane model was fine-tuned on the CurveLanes dataset to improve performance on curved roads and complex dashcam scenes.
+## 🚀 Tính năng chính
 
-Distance Estimation
+### 🚗 Phát hiện và theo dõi phương tiện
 
-Vehicle distance is estimated using monocular camera geometry and bounding-box information.
+- Phát hiện ô tô, xe tải và xe buýt trong video
+- Theo dõi phương tiện bằng BYTETrack
+- Sử dụng Kalman Filter để duy trì ID ổn định
+- Hạn chế đếm trùng khi phương tiện bị che khuất tạm thời
 
-To reduce unstable distance values, the pipeline combines:
+### 🛣️ Nhận diện làn đường
 
-Per-class vehicle height assumptions.
-Bounding-box and horizon-based estimation.
-Median filtering.
-Exponential moving average smoothing.
-Maximum frame-to-frame distance-change constraints.
-Temporal Violation Confirmation
+- Nhận diện vạch kẻ đường bằng UFLD-v2
+- Xác định vị trí phương tiện so với làn đường
+- Phát hiện xe camera đi lệch làn
+- Phát hiện phương tiện di chuyển ngoài làn
 
-Instead of reporting a violation from a single frame, suspicious events must persist across consecutive frames before being confirmed.
+### 📏 Ước tính khoảng cách
 
-This approach helps reduce false detections caused by:
+- Ước tính khoảng cách từ camera đến phương tiện phía trước
+- Làm mượt kết quả theo thời gian
+- Giảm hiện tượng khoảng cách thay đổi đột ngột giữa các khung hình
 
-Unstable bounding boxes.
-Temporary lane-detection errors.
-Short occlusions.
-Sudden camera movement.
-Noisy distance estimates.
-Asynchronous Processing
+### ⚠️ Cảnh báo hành vi nguy hiểm
 
-Vehicle detection, lane detection, video writing, and interface rendering are separated into asynchronous processing stages.
+- Giữ khoảng cách không an toàn
+- Phương tiện cắt đầu nguy hiểm
+- Xe camera đi lệch làn
+- Phương tiện di chuyển ngoài làn
+- Xác nhận vi phạm qua nhiều khung hình để giảm cảnh báo sai
+- Hạn chế ghi nhận trùng vi phạm theo ID phương tiện
 
-The implementation uses small queues that keep the newest frame and discard outdated frames, helping the interface remain responsive during video processing.
+### 🖥️ Giao diện Streamlit
 
-Low-light Enhancement
+- Tải và xử lý video
+- Hiển thị kết quả nhận diện trực tiếp
+- Theo dõi số phương tiện và số cảnh báo
+- Lưu video kết quả, ảnh bằng chứng và báo cáo vi phạm
 
-Optional CLAHE and gamma correction are applied to the detector input to improve vehicle visibility in dark or backlit dashcam footage.
+## 🧠 Quy trình xử lý
 
-Model Results
-YOLO11 Vehicle Detection
+```text
+Video camera hành trình
+        ↓
+Tiền xử lý khung hình
+        ↓
+YOLOv11 phát hiện phương tiện
+        ↓
+BYTETrack + Kalman Filter theo dõi ID
+        ↓
+UFLD-v2 nhận diện làn đường
+        ↓
+Ước tính khoảng cách và phân tích chuyển động
+        ↓
+Kiểm tra và xác nhận hành vi nguy hiểm
+        ↓
+Xuất video, ảnh bằng chứng và báo cáo
+```
 
-The included training run contains 50 epochs.
+## 🚨 Các loại cảnh báo
 
-Metric	Final epoch
-Precision	80.03%
-Recall	59.51%
-mAP@0.5	67.81%
-mAP@0.5:0.95	38.08%
+| Loại cảnh báo | Mô tả |
+|---|---|
+| `UNSAFE_DISTANCE` | Phương tiện phía trước ở khoảng cách không an toàn |
+| `DANGEROUS_CUT_IN` | Phương tiện chuyển làn và cắt vào phía trước xe camera |
+| `EGO_LANE_DEPARTURE` | Xe camera có dấu hiệu đi lệch khỏi làn đường |
+| `OUTSIDE_LANE` | Phương tiện di chuyển ra ngoài ranh giới làn đường |
 
-Training curves and evaluation images are available in:
+## 📊 Kết quả mô hình
 
-runs/detect/fast_adas_model/
-anh_thong_so/
+### YOLOv11 nhận diện phương tiện
 
+| Chỉ số | Kết quả |
+|---|---:|
+| Precision | 80.03% |
+| Recall | 59.51% |
+| mAP@0.5 | 67.81% |
+| mAP@0.5:0.95 | 38.08% |
 
+### UFLD-v2 nhận diện làn đường
 
+| Chỉ số | TuSimple gốc | CurveLanes Fine-tuned |
+|---|---:|---:|
+| Accuracy | 7.25% | 30.41% |
+| Precision | 36.88% | 81.89% |
+| Recall | 27.32% | 81.45% |
+| F1-score | 31.38% | 81.67% |
+| Validation Loss | 2.4799 | 1.5260 |
 
-Lane Detection
+## 🛠️ Công nghệ sử dụng
 
-Comparison between the original TuSimple model and the CurveLanes fine-tuned model:
+| Thành phần | Công nghệ |
+|---|---|
+| Ngôn ngữ | Python |
+| Deep Learning | PyTorch |
+| Phát hiện phương tiện | YOLOv11n |
+| Theo dõi phương tiện | BYTETrack, Kalman Filter |
+| Nhận diện làn đường | UFLD-v2 ResNet-18 |
+| Xử lý ảnh và video | OpenCV |
+| Xử lý dữ liệu | NumPy, Pandas, SciPy |
+| Giao diện | Streamlit |
+| Trực quan hóa | Matplotlib |
 
-Metric	TuSimple model	CurveLanes fine-tuned
-Strict Accuracy	7.25%	30.41%
-Precision	36.88%	81.89%
-Recall	27.32%	81.45%
-F1-score	31.38%	81.67%
-Validation Loss	2.4799	1.5260
+## ⚙️ Hướng dẫn cài đặt
 
+### Yêu cầu
 
+- Python 3.9 hoặc mới hơn
+- Git
+- Khuyến nghị GPU NVIDIA hỗ trợ CUDA
+- Có thể chạy bằng CPU nhưng tốc độ sẽ chậm hơn
 
+### Các bước cài đặt
 
-Technology Stack
-Category	Technology
-Programming language	Python
-Deep learning	PyTorch
-Vehicle detection	Ultralytics YOLO11
-Object tracking	BYTETrack, Kalman Filter
-Lane detection	UFLD
-Computer vision	OpenCV
-Numerical processing	NumPy, SciPy, Pandas
-Visualization	Matplotlib
-Web interface	Streamlit
-Project Structure
-detect_car/
-├── src/
-│   ├── app.py
-│   ├── main_pipeline.py
-│   ├── lane_detector.py
-│   ├── violation_classifier.py
-│   ├── byte_tracker.py
-│   ├── basetrack.py
-│   ├── kalman_filter.py
-│   ├── matching.py
-│   ├── train_lane_curvelanes.py
-│   ├── train_lane_tusimple.py
-│   ├── eval_lane_model.py
-│   ├── eval_old_vs_new.py
-│   └── plot_evaluation_charts.py
-│
-├── models/
-│   ├── curvelanes_scratch_best.json
-│   ├── accuracy_comparison_curve.png
-│   └── loss_comparison_curve.png
-│
-├── runs/detect/fast_adas_model/
-│   ├── weights/
-│   │   └── best.pt
-│   ├── results.csv
-│   ├── results.png
-│   └── confusion_matrix.png
-│
-├── anh_thong_so/
-│   ├── results.png
-│   ├── confusion_matrix.png
-│   ├── BoxP_curve.png
-│   ├── BoxR_curve.png
-│   └── BoxF1_curve.png
-│
-├── detect_video.py
-├── train_fast.py
-├── requirements.txt
-└── README.md
-Installation
-Requirements
-Python 3.9 or newer
-Git
-NVIDIA GPU with CUDA support is recommended
-CPU execution is supported but will be slower
-Clone the Repository
-git clone https://github.com/kuuhaku2012/detect_car.git
-cd detect_car
-Create a Virtual Environment
+#### 1. Clone repository
+
+```bash
+git clone https://github.com/Thienshinn1608/Dashcam-traffic-violation-detection.git
+cd Dashcam-traffic-violation-detection
+```
+
+#### 2. Tạo môi trường ảo
 
 Windows CMD:
 
+```cmd
 python -m venv .venv
 .venv\Scripts\activate
+```
 
-Windows PowerShell:
+Linux hoặc macOS:
 
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-
-Linux or macOS:
-
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-Install Dependencies
+```
+
+#### 3. Cài đặt thư viện
+
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
-Model Weights
+```
 
-The YOLO vehicle-detection weight is included at:
+#### 4. Chuẩn bị model
 
+Trọng số YOLOv11:
+
+```text
 runs/detect/fast_adas_model/weights/best.pt
+```
 
-The following UFLD weights are not stored directly in the repository because of their file sizes:
+Trọng số UFLD-v2:
 
-models/curvelanes_finetuned_best.pth
-models/tusimple_18.pth
-
-Download the required lane weight and place it inside the models/ directory before running the complete system.
-
-Expected structure:
-
+```text
 models/
 ├── curvelanes_finetuned_best.pth
 └── tusimple_18.pth
-Running the Application
+```
 
-Start the Streamlit dashboard:
+## ▶️ Chạy chương trình
 
+Chạy giao diện Streamlit:
+
+```bash
 streamlit run src/app.py
+```
 
-Open the local address displayed by Streamlit, normally:
+Mở trình duyệt tại:
 
+```text
 http://localhost:8501
+```
 
-From the dashboard, users can:
+Chạy nhận diện làn đường bằng dòng lệnh:
 
-Select a provided test video or upload a new video.
-Start and stop video processing.
-View annotated frames.
-Monitor FPS, vehicle count, and violation count.
-Review recent violation notifications.
-Lane Detection CLI
+```bash
+python detect_video.py --source path/to/video.mp4 --model models/curvelanes_finetuned_best.pth
+```
 
-Run the UFLD lane detector directly on a video:
+## 📁 Cấu trúc thư mục
 
-python detect_video.py ^
-    --source path/to/video.mp4 ^
-    --model models/curvelanes_finetuned_best.pth
+```text
+Dashcam-traffic-violation-detection/
+├── src/
+│   ├── app.py                         # Giao diện Streamlit
+│   ├── main_pipeline.py               # Pipeline xử lý chính
+│   ├── lane_detector.py               # Nhận diện làn đường
+│   ├── violation_classifier.py        # Phân loại hành vi nguy hiểm
+│   ├── byte_tracker.py                # Theo dõi phương tiện
+│   ├── kalman_filter.py               # Bộ lọc Kalman
+│   ├── matching.py                    # Ghép detection và track
+│   ├── train_lane_curvelanes.py       # Huấn luyện UFLD CurveLanes
+│   ├── train_lane_tusimple.py         # Huấn luyện UFLD TuSimple
+│   └── eval_lane_model.py             # Đánh giá mô hình làn đường
+│
+├── models/                             # Model và biểu đồ UFLD
+├── runs/detect/fast_adas_model/        # Model và kết quả YOLO
+├── anh_thong_so/                       # Biểu đồ đánh giá
+├── docs/                               # Ảnh giao diện và kết quả xử lý
+│   ├── giao_dien_xu_li.png
+│   ├── ket_qua_nhan_dien.png
+│   ├── ket_qua_vi_pham_khong_giu_khoang_cach.png
+│   └── ket_qua_vi_pham_lan_lan.png
+├── output/                              # Video và báo cáo đầu ra
+├── detect_video.py                     # Chạy nhận diện bằng CLI
+├── train_fast.py                       # Huấn luyện YOLOv11
+├── requirements.txt                    # Danh sách thư viện
+└── README.md                            # Tài liệu dự án
+```
 
-Linux or macOS:
+## 📸 Kết quả
 
-python detect_video.py \
-    --source path/to/video.mp4 \
-    --model models/curvelanes_finetuned_best.pth
+### Kết quả huấn luyện YOLOv11
 
-Use a webcam:
+<p align="center">
+  <img src="anh_thong_so/results.png" width="750" alt="Kết quả huấn luyện YOLOv11">
+</p>
 
-python detect_video.py --source 0 --model models/curvelanes_finetuned_best.pth
+### So sánh mô hình nhận diện làn đường
 
-Run without saving the processed video:
+<p align="center">
+  <img src="models/accuracy_comparison_curve.png" width="750" alt="So sánh mô hình nhận diện làn đường">
+</p>
 
-python detect_video.py \
-    --source path/to/video.mp4 \
-    --model models/curvelanes_finetuned_best.pth \
-    --no-save
-Training
-Train the Vehicle Detector
+### Ảnh giao diện và kết quả thực tế
 
-Update the dataset path inside train_fast.py, then run:
+Các ảnh minh họa của hệ thống được lưu trong thư mục `docs/` và hiển thị ở phần đầu README:
 
-python train_fast.py
+```text
+docs/
+├── giao_dien_xu_li.png
+├── ket_qua_nhan_dien.png
+├── ket_qua_vi_pham_khong_giu_khoang_cach.png
+└── ket_qua_vi_pham_lan_lan.png
+```
 
-The best model is saved by Ultralytics under:
+## 👨‍💻 Nội dung thực hiện
 
-runs/detect/fast_adas_model/weights/best.pt
-Train the CurveLanes Lane Detector
-python src/train_lane_curvelanes.py
-Train the TuSimple Lane Detector
-python src/train_lane_tusimple.py
-Evaluate Lane Models
-python src/eval_lane_model.py
+- Huấn luyện YOLOv11 để nhận diện phương tiện
+- Tích hợp BYTETrack và Kalman Filter để duy trì ID
+- Huấn luyện và đánh giá UFLD-v2 cho nhận diện làn đường
+- Xây dựng phương pháp ước tính khoảng cách từ camera đơn
+- Xây dựng luật phát hiện giữ khoảng cách không an toàn
+- Xây dựng luật phát hiện cắt đầu và đi lệch làn
+- Áp dụng xác nhận theo thời gian để giảm cảnh báo sai
+- Xây dựng giao diện Streamlit để xử lý video và hiển thị kết quả
 
-Compare two lane-model versions:
+## 📄 License
 
-python src/eval_old_vs_new.py
-Output
+Dự án học tập và nghiên cứu được thực hiện bởi **Ngô Long Thiên**.
 
-After processing, generated files are stored in the output/ directory.
-
-output/
-├── output_annotated.avi
-├── violation_log.csv
-└── violations/
-    ├── violation_001.jpg
-    ├── violation_002.jpg
-    └── ...
-
-The CSV report contains information such as:
-
-Timestamp
-Frame ID
-Track ID
-Violation type
-Estimated distance
-Evidence image path
-Current Limitations
-Monocular distance estimation is approximate and depends on camera position and calibration.
-Lane detection performance may decrease when lane markings are hidden, faded, or heavily occluded.
-Night scenes, rain, motion blur, and extreme camera angles can affect detection quality.
-Rule thresholds may need to be recalibrated for different cameras, resolutions, and vehicle speeds.
-The system is intended for research, education, and portfolio demonstration rather than legal enforcement.
-Future Improvements
-Calibrate distance estimation using real-world measured reference points.
-Evaluate tracking with MOTA, MOTP, IDF1, and ID-switch metrics.
-Add automatic camera calibration.
-Export models to ONNX or TensorRT.
-Add support for RTSP and live dashcam streams.
-Add Docker deployment.
-Add automated tests for violation rules.
-Build a labeled violation-event evaluation dataset.
-Improve night and adverse-weather performance.
-Deploy an online demonstration.
+Không sử dụng kết quả của hệ thống làm căn cứ xử phạt hoặc cho mục đích thương mại khi chưa được kiểm chứng.

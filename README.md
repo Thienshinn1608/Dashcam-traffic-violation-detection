@@ -7,6 +7,7 @@ Hệ thống ứng dụng trí tuệ nhân tạo để phát hiện và theo dõ
 | Họ và tên | MSSV |
 |---|---|
 | Ngô Long Thiên | 2001230920 |
+| Đinh Tấn Phương | 2001230706 |
 
 ## 📸 Giao diện và kết quả xử lý
 
@@ -291,7 +292,5 @@ docs/
 - Xây dựng giao diện Streamlit để xử lý video và hiển thị kết quả
 
 ## 📄 License
-
-Dự án học tập và nghiên cứu được thực hiện bởi **Ngô Long Thiên**.
 
 Không sử dụng kết quả của hệ thống làm căn cứ xử phạt hoặc cho mục đích thương mại khi chưa được kiểm chứng.
